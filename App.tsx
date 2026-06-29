@@ -1,45 +1,44 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Text } from 'react-native';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import DashboardScreen from './screens/DashboardScreen';
+import AddScreen from './screens/AddScreen';
+import ListScreen from './screens/ListScreen';
+
+const Tab = createBottomTabNavigator();
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={{
+          headerStyle: { backgroundColor: '#1a1a2e' },
+          headerTintColor: '#a78bfa',
+          tabBarStyle: { backgroundColor: '#1a1a2e', borderTopColor: '#2e2e4e' },
+          tabBarActiveTintColor: '#a78bfa',
+          tabBarInactiveTintColor: '#888',
+        }}
+      >
+        <Tab.Screen
+          name="Dashboard"
+          component={DashboardScreen}
+          options={{ tabBarIcon: () => <Text>📊</Text> }}
+        />
+        <Tab.Screen
+          name="Add"
+          component={AddScreen}
+          options={{ tabBarIcon: () => <Text>➕</Text> }}
+        />
+        <Tab.Screen
+          name="Transactions"
+          component={ListScreen}
+          options={{ tabBarIcon: () => <Text>📋</Text> }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
