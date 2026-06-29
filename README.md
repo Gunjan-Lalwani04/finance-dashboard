@@ -1,97 +1,129 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 💰 Finance Dashboard
 
-# Getting Started
+A native Android personal-finance app built with React Native. Track your income and expenses, organize them by category and payment method, and see where your money goes through a clean dashboard with month-by-month spending and savings charts. All data syncs to a cloud PostgreSQL database via Supabase.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## ✨ Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- **Dashboard with charts** — summary cards for total income, expenses, and balance, plus bar charts showing spending and savings month by month.
+- **Add transactions** — log income or expenses with an amount, category, payment method (cash / card / UPI), and an optional note.
+- **Smart categories** — the category list adapts to the transaction type (spending categories for expenses, income categories for income).
+- **Transactions list** — view all transactions newest-first, pull to refresh, and long-press to delete.
+- **Cloud sync** — every transaction is stored in a cloud PostgreSQL database, so the data lives beyond the device.
+- **Tab navigation** — Dashboard, Add, and Transactions tabs for an app-like experience.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 🛠️ Tech Stack
 
-# OR using Yarn
-yarn start
+| Layer | Technology |
+|-------|-----------|
+| Framework | React Native (CLI) |
+| Navigation | React Navigation (bottom tabs) |
+| Charts | react-native-gifted-charts + react-native-svg |
+| Backend / Database | Supabase (PostgreSQL) |
+| Language | JavaScript / TypeScript |
+
+---
+
+## 📁 Project Structure
+
+```
+FinanceDashboard/
+├── App.tsx                  # App entry + tab navigation
+├── lib/
+│   ├── supabase.js          # Supabase client setup
+│   └── config.js            # API keys (git-ignored — you create this)
+├── screens/
+│   ├── DashboardScreen.js   # Summary cards + monthly charts
+│   ├── AddScreen.js         # Add-transaction form
+│   └── ListScreen.js        # Transactions list
+├── android/                 # Native Android project
+└── package.json
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 🚀 Getting Started
 
-### Android
+### Prerequisites
 
-```sh
-# Using npm
-npm run android
+- **Node.js** 22.11.0 or newer
+- **JDK 17**
+- **Android Studio** + Android SDK
+- An Android device (with USB debugging) or an emulator
+- A free **Supabase** account
 
-# OR using Yarn
-yarn android
+### 1. Clone and install
+
+```bash
+git clone https://github.com/Gunjan-Lalwani04/finance-dashboard.git
+cd finance-dashboard
+npm install
 ```
 
-### iOS
+### 2. Set up Supabase
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Create a project at [supabase.com](https://supabase.com), then in the SQL Editor create the table:
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+```sql
+CREATE TABLE transactions (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  amount NUMERIC(12, 2) NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+  category TEXT NOT NULL,
+  note TEXT,
+  payment_method TEXT NOT NULL CHECK (payment_method IN ('cash', 'card', 'upi')),
+  date DATE NOT NULL DEFAULT CURRENT_DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-```sh
-bundle install
+ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all access"
+ON transactions FOR ALL
+USING (true) WITH CHECK (true);
 ```
 
-Then, and every time you update your native dependencies, run:
+### 3. Add your keys
 
-```sh
-bundle exec pod install
+Create `lib/config.js` with your Supabase project URL and anon key:
+
+```javascript
+export const SUPABASE_URL = 'https://your-project.supabase.co';
+export const SUPABASE_ANON_KEY = 'your-anon-key';
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+> This file is git-ignored so your keys stay private. Use the **anon / publishable** key, never the service-role key.
 
-```sh
-# Using npm
-npm run ios
+### 4. Run on your device
 
-# OR using Yarn
-yarn ios
+With an Android device connected (USB debugging on) or an emulator running:
+
+```bash
+npx react-native run-android
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## 📝 Notes
 
-## Step 3: Modify your app
+- Row Level Security uses an open "allow all" policy for this single-user version. A future version with user accounts would scope data per user.
+- New transactions use the current date. A date picker for logging past transactions is a planned improvement.
 
-Now that you have successfully run the app, let's make changes!
+## 🌱 Possible Future Improvements
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+- Date picker for back-dated transactions
+- Category breakdown (pie chart) of where money goes
+- Edit existing transactions
+- Filter the dashboard by month
+- User accounts and per-user data (Supabase Auth)
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+---
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 👤 Author
 
-## Congratulations! :tada:
+**Gunjan Lalwani**
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Built as a learning project to explore React Native, mobile development, and cloud databases.
